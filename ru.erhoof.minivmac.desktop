@@ -1,0 +1,17 @@
+[Desktop Entry]
+Type=Application
+X-Nemo-Application-Type=generic
+Icon=ru.erhoof.minivmac
+Exec=/usr/bin/ru.erhoof.minivmac
+Name=Mini vMac
+
+[X-Application]
+Permissions=Audio;UserDirs
+OrganizationName=ru.erhoof
+ApplicationName=minivmac
+ExecDBus=/usr/bin/ru.erhoof.minivmac
+
+[X-Aurora-Application]
+IconMode=Crop
+Orientation=Landscape
+SmallScreenOrientation=Landscape
