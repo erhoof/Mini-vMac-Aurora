@@ -5,10 +5,9 @@
 ## Introduction
 This is a port of SDL2 version of Mini vMac
 - Supports audio
-- Supports video at 640x400 (x3 scale) with 256 colors
+- Supports video at 512x384 (scales automatically) with 256 colors
 - Supports touch
 - Supports landscape mode
-- Looks best at 1920x1200 screens (for now)
 
 due to Mini vMac architecture, only one resolution is available (for now)
 
