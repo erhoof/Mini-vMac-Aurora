@@ -80,8 +80,8 @@ typedef unsigned long long ui6b;
 #define IncludeSonyNew 1
 #define IncludeSonyNameNew 1
 
-#define vMacScreenHeight 400
-#define vMacScreenWidth 640
+#define vMacScreenHeight 384
+#define vMacScreenWidth 512
 #define vMacScreenDepth 3
 
 #define kROM_Size 0x00040000

@@ -64,6 +64,27 @@ LOCALVAR char *pref_dir = NULL;
 #define MyPathSep '/'
 #endif
 
+static double own_scale = 0;
+static int x_offset = 0;
+static int y_offset = 0;
+void init_scale(SDL_Window *w) {
+    int width, height;
+    SDL_GetWindowSize(w, &width, &height);
+
+    if(width > 1200) {
+        own_scale = 4;
+    } else if(width > 720) {
+        own_scale = 3;
+    } else {
+        own_scale = 1.75;
+    }
+
+    x_offset = (width - vMacScreenHeight * own_scale) / 2; 
+    y_offset = (height - vMacScreenWidth * own_scale) / 2;
+
+    fprintf(stderr, "%dx%d %dx%d by %d (%d, %d)\n", width, height, vMacScreenWidth, vMacScreenHeight, own_scale, x_offset, y_offset);
+}
+
 LOCALFUNC tMacErr ChildPath(char *x, char *y, char **r)
 {
     tMacErr err = mnvm_miscErr;
@@ -1083,10 +1104,10 @@ LOCALPROC HaveChangedScreenBuff(ui4r top, ui4r left,
     src_rect.w = vMacScreenWidth;
     src_rect.h = vMacScreenHeight;
 
-    dst_rect.x = 0 - (vMacScreenWidth - vMacScreenHeight) / 2 * MyWindowScale;
-    dst_rect.y = 0 + (vMacScreenWidth - vMacScreenHeight) / 2 * MyWindowScale;
-    dst_rect.w = vMacScreenWidth * MyWindowScale;
-    dst_rect.h = vMacScreenHeight * MyWindowScale;
+    dst_rect.x = 0 - (vMacScreenWidth - vMacScreenHeight) / 2 * own_scale + x_offset;
+    dst_rect.y = 0 + (vMacScreenWidth - vMacScreenHeight) / 2 * own_scale + y_offset;
+    dst_rect.w = vMacScreenWidth * own_scale;
+    dst_rect.h = vMacScreenHeight * own_scale;
 
     /* SDL_RenderClear(my_renderer); */
     SDL_RenderCopyEx(my_renderer, my_texture, &src_rect, &dst_rect, 90.0, NULL, SDL_FLIP_NONE);
@@ -1191,8 +1212,10 @@ LOCALPROC MousePositionNotify(int NewMousePosh, int NewMousePosv)
 #endif
 
     if (1) {
-        NewMousePosh /= MyWindowScale;
-        NewMousePosv /= MyWindowScale;
+        NewMousePosv -= y_offset;
+        NewMousePosh -= x_offset;
+        NewMousePosh /= own_scale;
+        NewMousePosv /= own_scale;
     }
     int temp = NewMousePosv;
     NewMousePosv = vMacScreenHeight - NewMousePosh;
@@ -3537,7 +3560,7 @@ LOCALFUNC blnr CreateMainWindow(void)
         v = trueblnr;
     }
 
-    fprintf(stderr, "Here!\n");
+    init_scale(my_main_wind);
 
     return v;
 }

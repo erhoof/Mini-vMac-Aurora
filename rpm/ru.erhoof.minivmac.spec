@@ -1,6 +1,6 @@
 Name:       ru.erhoof.minivmac
 Summary:    Mini vMac
-Version:    0.1
+Version:    0.2
 Release:    1
 License:    GPLv2
 URL:        https://github.com/erhoof/minivmac_aurora
