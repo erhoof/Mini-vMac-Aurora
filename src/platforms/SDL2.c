@@ -64,25 +64,31 @@ LOCALVAR char *pref_dir = NULL;
 #define MyPathSep '/'
 #endif
 
-static double own_scale = 0;
-static int x_offset = 0;
-static int y_offset = 0;
+double own_scale = 0;
+double mouse_x_coefficient = 0;
+double mouse_y_coefficient = 0;
+int x_offset = 0;
+int y_offset = 0;
+int touch_mode = 0;
 void init_scale(SDL_Window *w) {
     int width, height;
     SDL_GetWindowSize(w, &width, &height);
 
     if(width > 1200) {
-        own_scale = 4;
+        own_scale = 4.0;
     } else if(width > 720) {
-        own_scale = 3;
+        own_scale = 3.0;
     } else {
         own_scale = 1.75;
     }
 
     x_offset = (width - vMacScreenHeight * own_scale) / 2; 
     y_offset = (height - vMacScreenWidth * own_scale) / 2;
+    mouse_x_coefficient = width / (vMacScreenHeight * own_scale - x_offset);
+    mouse_y_coefficient = height / (vMacScreenWidth * own_scale - y_offset);
 
-    fprintf(stderr, "%dx%d %dx%d by %d (%d, %d)\n", width, height, vMacScreenWidth, vMacScreenHeight, own_scale, x_offset, y_offset);
+    fprintf(stderr, "%dx%d %dx%d by %f (%d, %d) (%f, %f)\n",
+        width, height, vMacScreenWidth, vMacScreenHeight, own_scale, x_offset, y_offset, mouse_x_coefficient, mouse_y_coefficient);
 }
 
 LOCALFUNC tMacErr ChildPath(char *x, char *y, char **r)
@@ -1211,15 +1217,22 @@ LOCALPROC MousePositionNotify(int NewMousePosh, int NewMousePosv)
     }
 #endif
 
-    if (1) {
+    if(touch_mode) {
         NewMousePosv -= y_offset;
         NewMousePosh -= x_offset;
-        NewMousePosh /= own_scale;
-        NewMousePosv /= own_scale;
+    } else {
+        NewMousePosh *= mouse_y_coefficient;
+        NewMousePosv *= mouse_x_coefficient;
     }
-    int temp = NewMousePosv;
-    NewMousePosv = vMacScreenHeight - NewMousePosh;
-    NewMousePosh = temp;
+
+    NewMousePosh /= own_scale;
+    NewMousePosv /= own_scale;
+
+    if(touch_mode) {
+        int temp = NewMousePosv;
+        NewMousePosv = vMacScreenHeight - NewMousePosh;
+        NewMousePosh = temp;
+    }
 
 #if EnableMagnify
     if (UseMagnify) {
@@ -3173,6 +3186,11 @@ LOCALPROC HandleTheEvent(SDL_Event *event)
             }
             break;
         case SDL_MOUSEMOTION:
+            if(SDL_TOUCH_MOUSEID == event->button.which) {
+                touch_mode = 1;
+            } else {
+                touch_mode = 0;
+            }
 #if EnableFSMouseMotion && ! HaveWorkingWarp
             if (HaveMouseMotion) {
                 MousePositionNotifyRelative(
@@ -3185,6 +3203,11 @@ LOCALPROC HandleTheEvent(SDL_Event *event)
             }
             break;
         case SDL_MOUSEBUTTONDOWN:
+            if(SDL_TOUCH_MOUSEID == event->button.which) {
+                touch_mode = 1;
+            } else {
+                touch_mode = 0;
+            }
             /* any mouse button, we don't care which */
 #if EnableFSMouseMotion && ! HaveWorkingWarp
             if (HaveMouseMotion) {
