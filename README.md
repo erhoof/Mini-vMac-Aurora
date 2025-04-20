@@ -28,3 +28,9 @@ v0.1 is available on Releases page
 ![](screenshots/1.png)
 ![](screenshots/2.png)
 ![](screenshots/3.png)
+
+## Promote materials
+![](screenshots/p_1.png)
+![](screenshots/p_2.png)
+![](screenshots/p_3.png)
+![](screenshots/p_4.png)
